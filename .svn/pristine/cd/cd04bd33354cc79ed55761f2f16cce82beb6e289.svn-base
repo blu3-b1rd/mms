@@ -1,0 +1,37 @@
+package com.bandtastic.sampleband;
+
+import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
+import android.view.MenuItem;
+
+import com.bandtastic.sampleband.fragment.NewsSectionFragment;
+import com.myband.sample.R;
+import com.slidinglayer.SlidingLayer;
+
+public class HomeActivity extends FragmentActivity {
+
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		this.setContentView(R.layout.activity_home);
+		this.configure();
+	};
+	
+	private void configure(){
+		this.getActionBar().setDisplayHomeAsUpEnabled(true);
+		FragmentTransaction transaction = this.getSupportFragmentManager().beginTransaction();
+		transaction.replace(R.id.current_fragment_container, new NewsSectionFragment());
+		transaction.commit();
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch(item.getItemId()){
+		case android.R.id.home:
+			((SlidingLayer) this.findViewById(R.id.left_panel)).openLayer(true);
+			break;
+		}
+		return super.onOptionsItemSelected(item);
+	}
+	
+}

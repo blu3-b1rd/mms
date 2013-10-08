@@ -1,0 +1,95 @@
+package com.mms.app.sections;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+
+import android.content.Context;
+import android.os.Bundle;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+
+import com.mms.Config;
+import com.mms.MMSActivity;
+import com.mms.MMSApplication;
+import com.mms.app.R;
+import com.mms.model.MMSGalleryItem;
+import com.mms.model.MMSList;
+import com.mms.model.MMSModel;
+import com.mms.model.MMSResponse;
+import com.mms.request.GetArtistGallery;
+import com.mms.request.MMSAsyncRequest;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+
+public class GallerySectionActivity extends MMSActivity {
+	
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		this.setContentView(R.layout.activity_gallery);
+		new MMSAsyncRequest(this).execute(new GetArtistGallery(
+				((MMSApplication) this.getApplication()).loadCookie()));
+	}
+
+	@Override
+	public void onMMSRequestFinished(MMSResponse response) {
+		super.onMMSRequestFinished(response);
+		this.findViewById(R.id.progress).setVisibility(View.GONE);
+	}
+	
+	@Override
+	protected void onSuccessfulResponse(MMSResponse response) {
+		
+	}
+
+	private class GalleryAdapter extends ArrayAdapter<MMSModel> {
+		
+		private MMSList gallery;
+		private DisplayImageOptions options;
+		private ImageLoader imageLoader = ImageLoader.getInstance();
+		
+		public GalleryAdapter(Context context, MMSList gallery){
+			super(context, R.layout.list_item_album, gallery);
+			this.gallery = gallery;
+			this.options = new DisplayImageOptions.Builder()
+				.showStubImage(R.drawable.default_album_art)
+				.showImageForEmptyUri(R.drawable.default_album_art)
+				.showImageOnFail(R.drawable.default_album_art)
+				.cacheInMemory()
+				.build();
+		}
+		
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			View view = convertView;
+			
+			if(convertView == null){
+				view = new ImageView(this.getContext());
+			}
+			
+			MMSGalleryItem item = (MMSGalleryItem) this.gallery.get(position);
+			
+			try {
+				String uri = new URI(Config.MMS_BASE_IMAGE_URL + item.getUrl()).toString();
+				this.imageLoader.displayImage(uri, (ImageView) view, this.options);
+			} catch (URISyntaxException e) {
+				e.printStackTrace();
+			}
+			return view;
+		}
+		
+		@Override
+		public MMSModel getItem(int position) {
+			return this.gallery.get(position);
+		}
+		
+		@Override
+		public int getCount() {
+			return this.gallery.size();
+		}
+		
+	}
+	
+}

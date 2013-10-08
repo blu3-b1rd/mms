@@ -1,0 +1,65 @@
+package com.bandtastic.sampleband.fragment;
+
+import java.util.Arrays;
+
+import android.content.Context;
+import android.os.Bundle;
+import android.support.v4.app.ListFragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+
+import com.myband.sample.R;
+
+public class HomeSectionsFragment extends ListFragment {
+
+	private static final String[] MOVIES = new String[] { "A Separation", "Beasts of the Southern Wild", "Being John Malkovich", "Capote",
+        "Cast Away", "City of God", "Cloud Atlas", "Dead Poet's Society" };
+	
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+		Arrays.sort(MOVIES);
+		CarouselListAdapter adapter = new CarouselListAdapter(this.getActivity());
+		for(String movie : MOVIES){
+			adapter.add(movie);
+		}
+		this.setListAdapter(adapter);
+		return inflater.inflate(R.layout.fragment_home_sections, container, false);
+	}
+	
+	private static final class CarouselListAdapter extends ArrayAdapter<String> {
+
+        public CarouselListAdapter(Context context) {
+            super(context, 0);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            if (convertView == null) {
+            	convertView = LayoutInflater.from(this.getContext())
+            			.inflate(R.layout.list_item_sections, parent, false);
+            }
+            
+            return convertView;
+        }
+
+        @Override
+        public boolean hasStableIds() {
+            return true;
+        }
+
+        @Override
+        public int getCount() {
+        	return MOVIES.length;
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+    }
+	
+}

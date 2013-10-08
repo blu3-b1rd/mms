@@ -1,0 +1,102 @@
+package com.mms;
+
+import android.app.Activity;
+import android.app.Application;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+
+import com.facebook.Session;
+import com.mms.app.SplashActivity;
+import com.mms.app.util.LoginType;
+import com.mms.model.MMSUser;
+import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
+
+public class MMSApplication extends Application {
+
+	private final String MMS_PREFERENCES = "mms_" + Config.ARTIST_ALIAS;
+	private final String PREF_COOKIE = "cookie";
+	private final String PREF_LOGIN_TYPE = "login_type";
+	private final String PREF_PASSWORD = "password";
+	
+	private SharedPreferences preferences;
+	
+	private MMSUser user = null;
+	
+	@Override
+	public void onCreate() {
+		super.onCreate();
+		this.initImageLoader(this);
+		this.preferences = this.getSharedPreferences(MMS_PREFERENCES, Context.MODE_PRIVATE);
+	}
+	
+	private void initImageLoader(Context context){
+		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(context)
+			.threadPriority(Thread.NORM_PRIORITY - 2)
+			.denyCacheImageMultipleSizesInMemory()
+			.discCacheFileNameGenerator(new Md5FileNameGenerator())
+			.tasksProcessingOrder(QueueProcessingType.LIFO)
+			.build();
+		ImageLoader.getInstance().init(config);
+	}
+	
+	public LoginType loadLoginType(){
+		int loginIndex = this.preferences.getInt(PREF_LOGIN_TYPE, -1);
+		if(loginIndex < 0){
+			return null;
+		} else {
+			return LoginType.values()[loginIndex];
+		}
+	}
+	
+	public String loadCookie(){
+		return this.preferences.getString(PREF_COOKIE, null);
+	}
+	
+	public String loadPassword(){
+		return this.preferences.getString(PREF_PASSWORD, null);
+	}
+	
+	private void saveNewCredentials(String cookie, LoginType loginType){
+		Editor editor = this.preferences.edit();
+		
+		editor.putString(PREF_COOKIE, cookie);
+		editor.putInt(PREF_LOGIN_TYPE, loginType.ordinal());
+		
+		editor.commit();
+	}
+	
+	private void removeCredentials(){
+		Editor editor = this.preferences.edit();
+		
+		editor.putString(PREF_COOKIE, null);
+		editor.putInt(PREF_LOGIN_TYPE, -1);
+		
+		editor.commit();
+	}
+	
+	public void setUser(MMSUser user){
+		this.user = user;
+		this.saveNewCredentials(this.user.getCookie(),
+				this.user.getAccount().getLoginType());
+	}
+	
+	public MMSUser getUser(){
+		return this.user;
+	}
+	
+	public void logout(Context context){
+		Session fbSession = Session.getActiveSession();
+		if(fbSession != null && fbSession.isOpened()){
+			fbSession.closeAndClearTokenInformation();
+		}
+		this.removeCredentials();
+		context.startActivity(new Intent(context, SplashActivity.class));
+		((Activity) context).finish();
+	}
+	
+}

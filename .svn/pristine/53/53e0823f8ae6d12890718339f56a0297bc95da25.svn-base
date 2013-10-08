@@ -1,0 +1,145 @@
+package com.myband.sample.fragment;
+
+import android.content.Context;
+import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
+
+import com.myband.sample.R;
+
+public class MeFragment extends Fragment {
+
+	private static final int CURRENT_RATING = 4;
+	private static final String TAG_RATING_DETAILS_DIALOG = "rating_details_dialog";
+
+	private ListView ratingList;
+
+	private enum RatingLevel {
+		FAN_FROM_HELL("Fan from hell"), OBSESIVE("Obsesive"), GROUPIE("Groupie"), FAN(
+				"Fan"), NEWBIE("Newbie");
+
+		private String label;
+
+		private RatingLevel(String label) {
+			this.label = label;
+		}
+
+		public String getLabel() {
+			return this.label;
+		}
+		
+		public static int getActualLevel(int level){
+			return RatingLevel.values().length - CURRENT_RATING;
+		}
+
+	}
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+		return inflater.inflate(R.layout.fragment_me_guy, container, false);
+	}
+
+	@Override
+	public void onViewCreated(View view, Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+		this.ratingList = (ListView) view.findViewById(R.id.rating_level);
+		this.ratingList.setAdapter(new RatingLevelAdapter(this.getActivity()));
+		this.ratingList.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> adapter, View view, int position,
+					long viewId) {
+				onRatingClicked(position);
+			}
+		});
+	}
+
+	private static final class RatingLevelAdapter extends
+			ArrayAdapter<RatingLevel> {
+
+		public RatingLevelAdapter(Context context) {
+			super(context, 0);
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			convertView = LayoutInflater.from(this.getContext()).inflate(
+					R.layout.list_item_rating_guy, parent, false);
+
+			if (position < RatingLevel.getActualLevel(CURRENT_RATING)) {
+				((ImageView) convertView.findViewById(R.id.rating_point))
+						.setImageResource(R.drawable.ic_rating_blank);
+			} else {
+				((ImageView) convertView.findViewById(R.id.rating_point))
+						.setImageResource(R.drawable.ic_rating_star);
+			}
+
+			if (position == RatingLevel.getActualLevel(CURRENT_RATING)) {
+				convertView.findViewById(R.id.rating_title).setVisibility(
+						View.VISIBLE);
+				((TextView) convertView.findViewById(R.id.rating_title))
+					.setText(RatingLevel.values()[RatingLevel.getActualLevel(CURRENT_RATING)].getLabel());
+			}
+
+			return convertView;
+		}
+
+		@Override
+		public int getCount() {
+			return RatingLevel.values().length;
+		}
+
+	}
+
+	private void onRatingClicked(int position){
+		FragmentTransaction transaction = this.getFragmentManager().beginTransaction();
+    	Fragment prevDialog = this.getFragmentManager().findFragmentByTag(TAG_RATING_DETAILS_DIALOG);
+    	
+    	if(prevDialog != null){
+    		transaction.remove(prevDialog);
+    	}
+    	transaction.commit();
+		DialogFragment dialog = new RatingDetailsFragment();
+		Bundle args = new Bundle();
+		args.putInt("rating_selected", position);
+		dialog.setArguments(args);
+		dialog.show(this.getFragmentManager(), TAG_RATING_DETAILS_DIALOG);
+	}
+	
+	public static class RatingDetailsFragment extends DialogFragment {
+		
+		private int ratingSelected;
+		
+		@Override
+		public void onCreate(Bundle savedInstanceState) {
+			super.onCreate(savedInstanceState);
+			this.setStyle(DialogFragment.STYLE_NO_TITLE, R.style.news_dialog);
+			this.ratingSelected = this.getArguments().getInt("rating_selected");
+		}
+		
+		@Override
+		public View onCreateView(LayoutInflater inflater, ViewGroup container,
+				Bundle savedInstanceState) {
+			return inflater.inflate(R.layout.fragment_rating_details, container, false);
+		}
+		
+		@Override
+		public void onViewCreated(View view, Bundle savedInstanceState) {
+			super.onViewCreated(view, savedInstanceState);
+			((TextView) view.findViewById(R.id.rating_title)).setText(
+					RatingLevel.values()[ratingSelected].getLabel());
+		}
+		
+	}
+
+}

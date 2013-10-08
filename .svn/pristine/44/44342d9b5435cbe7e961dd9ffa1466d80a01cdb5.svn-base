@@ -1,0 +1,107 @@
+package com.mms.sample.sections;
+
+import android.app.ListActivity;
+import android.content.Context;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.mms.MMSApplication;
+import com.mms.sample.R;
+import com.mms.sample.model.MMSAlbum;
+import com.mms.sample.model.MMSList;
+import com.mms.sample.model.MMSModel;
+import com.mms.sample.model.MMSResponse;
+import com.mms.sample.request.GetDiscography;
+import com.mms.sample.request.MMSAsyncRequest;
+import com.mms.sample.request.MMSAsyncRequest.OnMMSRequestFinishedListener;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+
+public class DiscographyActivity extends ListActivity implements OnMMSRequestFinishedListener {
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		this.setContentView(R.layout.activity_discography);
+		new MMSAsyncRequest(this).execute(new GetDiscography(
+				((MMSApplication) this.getApplication()).loadCookie()));
+	}
+	
+	@Override
+	public void onMMSRequestFinished(MMSResponse response) {
+		this.findViewById(R.id.progress).setVisibility(View.GONE);
+		this.findViewById(R.id.discography_container).setVisibility(View.VISIBLE);
+		if(response == null){
+			Toast.makeText(this, "Connection Failed", Toast.LENGTH_SHORT).show();
+		} else if(response.getStatus() == 200){
+			this.setListAdapter(new DiscographyAdapter(this, (MMSList) response.getContent()));
+		} else {
+			Toast.makeText(this, response.getMessage(), Toast.LENGTH_SHORT).show();
+		}
+	}
+	
+	private class DiscographyAdapter extends ArrayAdapter<MMSModel> {
+		
+		private MMSList discography;
+		private DisplayImageOptions options;
+		private ImageLoader imageLoader = ImageLoader.getInstance();
+		
+		private class ViewHolder {
+			public ImageView albumArt;
+			public TextView albumTitle;
+			public TextView releaseDate;
+			public TextView label;
+		}
+		
+		public DiscographyAdapter(Context context, MMSList discography) {
+			super(context, R.layout.list_item_album, discography);
+			this.discography = discography;
+			this.options = new DisplayImageOptions.Builder()
+				.showStubImage(R.drawable.album_art)
+				.showImageForEmptyUri(R.drawable.album_art)
+				.showImageOnFail(R.drawable.album_art)
+				.cacheInMemory()
+				.build();
+		}
+		
+		@Override
+		public int getCount() {
+			return this.discography.size();
+		}
+		
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			View view = convertView;
+			final ViewHolder holder;
+			
+			if(convertView == null){
+				view = LayoutInflater.from(this.getContext()).inflate(R.layout.list_item_album,  parent, false);
+				holder = new ViewHolder();
+				holder.albumArt = (ImageView) view.findViewById(R.id.album_art);
+				holder.albumTitle = (TextView) view.findViewById(R.id.album_title);
+				holder.releaseDate = (TextView) view.findViewById(R.id.release_date);
+				holder.label = (TextView) view.findViewById(R.id.label);
+				view.setTag(holder);
+			} else {
+				holder = (ViewHolder) view.getTag();
+			}
+			
+			MMSAlbum current = (MMSAlbum) this.discography.get(position);
+			
+			this.imageLoader.displayImage(current.getAlbumCoverUrl(), holder.albumArt, this.options);
+			holder.albumTitle.setText(current.getName());
+			holder.releaseDate.setText("Released on - " + current.getReleaseDate());
+			holder.label.setText(current.getLabel());
+			
+			return view;
+		}
+		
+	}
+	
+}

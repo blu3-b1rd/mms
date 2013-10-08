@@ -1,0 +1,78 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.mms.app"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <uses-sdk
+        android:minSdkVersion="11"
+        android:targetSdkVersion="18" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
+    
+    <permission android:name="com.mms.sample.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+    <uses-permission android:name="com.mms.sample.permission.C2D_MESSAGE" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:name="com.mms.MMSApplication" >
+        <activity
+            android:name=".SplashActivity"
+            android:screenOrientation="portrait" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".OldHomeActivity"
+            android:icon="@drawable/logo"
+            android:label=""
+            android:screenOrientation="portrait" />
+		<activity 
+		    android:name=".RegisterActivity"
+		    android:icon="@drawable/logo"
+		    android:label=""
+		    android:screenOrientation="portrait"/>
+		<activity 
+		    android:name=".sections.MeSectionActivity"
+		    android:icon="@drawable/logo"/>
+		<activity 
+		    android:name=".sections.DiscographySectionActivity"
+		    android:icon="@drawable/logo"
+		    android:label=""/>
+		<activity 
+		    android:name=".AlbumActivity"
+		    android:icon="@drawable/logo"
+		    android:label=""/>
+		<activity 
+		    android:name=".sections.GallerySectionActivity"
+		    android:icon="@drawable/logo"
+		    android:label=""/>
+		
+        <!-- Facebook Stuffs -->
+        <activity android:name="com.facebook.LoginActivity"/>
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id" />
+        
+        <!-- GCM -->
+        <receiver 
+            android:name="com.mms.MMSMessagingReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND">
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
+                <category android:name="com.mms.sample"/>
+            </intent-filter>
+        </receiver>
+        <service android:name="com.mms.sample.MMSNotificationService"/>
+    </application>
+
+</manifest>

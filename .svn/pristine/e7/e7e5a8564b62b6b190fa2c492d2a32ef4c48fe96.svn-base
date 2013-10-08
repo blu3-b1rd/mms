@@ -1,0 +1,178 @@
+package com.myband.sample.model;
+
+import org.json.JSONObject;
+
+public class YoutubeVideo implements BaseModel {
+	
+	private String id;
+	private String kind;
+	private String etag;
+	private String publishedAt;
+	private String channelId;
+	private String channelTitle;
+	private int categoryId;
+	private String title;
+	private String description;
+	private String thumbDefault;
+	private String thumbMedium;
+	private String thumbHigh;
+	
+	private YoutubeVideo(){}
+	
+	public String getId() {
+		return id;
+	}
+
+	private void setId(String id) {
+		this.id = id;
+	}
+
+	public String getKind() {
+		return kind;
+	}
+
+	private void setKind(String kind) {
+		this.kind = kind;
+	}
+
+	public String getEtag() {
+		return etag;
+	}
+
+	private void setEtag(String etag) {
+		this.etag = etag;
+	}
+
+	public String getPublishedAt() {
+		return publishedAt;
+	}
+
+	private void setPublishedAt(String publishedAt) {
+		this.publishedAt = publishedAt;
+	}
+
+	public String getChannelId() {
+		return channelId;
+	}
+
+	private void setChannelId(String channelId) {
+		this.channelId = channelId;
+	}
+
+	public String getChannelTitle() {
+		return channelTitle;
+	}
+
+	private void setChannelTitle(String channelTitle) {
+		this.channelTitle = channelTitle;
+	}
+
+	public int getCategoryId() {
+		return categoryId;
+	}
+
+	private void setCategoryId(int categoryId) {
+		this.categoryId = categoryId;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	private void setTitle(String title) {
+		this.title = title;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	private void setDescription(String description) {
+		this.description = description;
+	}
+
+	public String getThumbDefault() {
+		return thumbDefault;
+	}
+
+	private void setThumbDefault(String thumbDefault) {
+		this.thumbDefault = thumbDefault;
+	}
+
+	public String getThumbMedium() {
+		return thumbMedium;
+	}
+
+	private void setThumbMedium(String thumbMedium) {
+		this.thumbMedium = thumbMedium;
+	}
+
+	public String getThumbHigh() {
+		return thumbHigh;
+	}
+
+	private void setThumbHigh(String thumbHigh) {
+		this.thumbHigh = thumbHigh;
+	}
+
+	public static class Builder extends BaseBuilder {
+
+		/*
+		 private String id;
+		private String kind;
+		private String etag;
+		private String publishedAt;
+		private String channelId;
+		private String channelTitle;
+		private int categoryId;
+		private String title;
+		private String description;
+		private String thumbDefault;
+		private String thumbMedium;
+		private String thumbHigh;
+		 */
+			
+		private static final String TAG_ID = "id";
+		private static final String TAG_KIND = "kind";
+		private static final String TAG_ETAG = "etag";
+		private static final String TAG_SNIPPET = "snippet";
+		private static final String TAG_PUBLISHED_AT = "publishedAt";
+		private static final String TAG_CHANNEL_ID = "channelId";
+		private static final String TAG_TITLE = "title";
+		private static final String TAG_DESCRIPTION = "description";
+		private static final String TAG_THUMBNAILS = "thumbnails";
+		private static final String TAG_THUMB_DEFAULT = "default";
+		private static final String TAG_THUMB_MEDIUM = "medium";
+		private static final String TAG_THUMB_HIGH = "high";
+		private static final String TAG_CHANNEL_TITLE = "channelTitle";
+		private static final String TAG_CATEGORY_ID = "categoryId";
+		
+		@Override
+		public BaseModel buildModel(String input) throws Exception {
+			JSONObject json = new JSONObject(input);
+			
+			YoutubeVideo youtubeVideo = new YoutubeVideo();
+			
+			youtubeVideo.setId(json.getString(TAG_ID));
+			youtubeVideo.setKind(json.getString(TAG_KIND));
+			youtubeVideo.setEtag(json.getString(TAG_ETAG));
+			
+			JSONObject snippet = json.getJSONObject(TAG_SNIPPET);
+			youtubeVideo.setPublishedAt(snippet.getString(TAG_PUBLISHED_AT));
+			youtubeVideo.setChannelId(snippet.getString(TAG_CHANNEL_ID));
+			youtubeVideo.setTitle(snippet.getString(TAG_TITLE));
+			youtubeVideo.setDescription(snippet.getString(TAG_DESCRIPTION));
+			youtubeVideo.setChannelTitle(snippet.getString(TAG_CHANNEL_TITLE));
+			youtubeVideo.setCategoryId(snippet.getInt(TAG_CATEGORY_ID));
+			
+			JSONObject thumbnails = snippet.getJSONObject(TAG_THUMBNAILS);
+			youtubeVideo.setThumbDefault(thumbnails.getString(TAG_THUMB_DEFAULT));
+			youtubeVideo.setThumbMedium(thumbnails.getString(TAG_THUMB_MEDIUM));
+			youtubeVideo.setThumbHigh(thumbnails.getString(TAG_THUMB_HIGH));
+			
+			return youtubeVideo;
+		}
+		
+	}
+
+}

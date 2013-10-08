@@ -1,0 +1,41 @@
+<resources>
+
+    <!-- Compat ActionBar customization -->
+    <style name="Theme.MMS"
+           parent="@style/Theme.AppCompat.Light">
+        <item name="actionBarStyle">@style/Theme.MMS.ActionBar</item>
+        <item name="actionBarTabBarStyle">@style/Theme.MMS.ActionBar.TabBar</item>
+
+        <item name="android:actionBarStyle">@style/Theme.MMS.ActionBar</item>
+        <item name="android:actionBarTabBarStyle">@style/Theme.MMS.ActionBar.TabBar</item>
+    </style>
+
+    <style name="Theme.MMS.ActionBar"
+           parent="@style/Widget.AppCompat.ActionBar">
+        <item name="titleTextStyle">@style/Theme.MMS.ActionBar.Title</item>
+
+        <item name="android:titleTextStyle">@style/Theme.MMS.ActionBar.Title</item>
+    </style>
+
+    <style name="Theme.MMS.ActionBar.Title"
+           parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Title">
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <style name="Theme.MMS.ActionBar.TabBar"
+           parent="@style/Widget.AppCompat.Light.ActionBar.TabBar">
+        <item name="background">@android:color/white</item>
+        <item name="android:background">@android:color/white</item>
+    </style>
+    
+    <style name="pick_friend_dialog" parent="@style/Theme.AppCompat.Light">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowNoTitle">true</item>
+    </style>
+    
+    <style name="news_dialog" parent="@android:style/Theme.Dialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowNoTitle">true</item>
+    </style>
+
+</resources>

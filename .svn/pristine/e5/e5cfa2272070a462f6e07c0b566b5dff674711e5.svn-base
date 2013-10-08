@@ -1,0 +1,56 @@
+package com.myband.sample.request;
+
+import java.util.List;
+
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpUriRequest;
+
+import com.myband.sample.model.BaseModel.BaseBuilder;
+import com.myband.sample.model.YoutubeVideosList;
+import com.myband.sample.util.Config;
+
+public class YoutubeVideosInfoRequest extends BaseRequest {
+	
+	private static final String BASE_URL = "https://www.googleapis.com/youtube/v3";
+	private static final String METHOD_NAME = "videos";
+	 
+	private List<String> videosIds;
+	private OnRequestFinishedListener listener;
+	
+	public YoutubeVideosInfoRequest(List<String> videosIds, OnRequestFinishedListener listener){
+		super(BASE_URL, METHOD_NAME, RequestType.HTTP_GET);
+		this.videosIds = videosIds;
+		this.listener = listener;
+	}
+	
+	@Override
+	protected String concatMethodName() {
+		return this.getRequestUrl() + "/" + this.getMethodName() + "?";
+	}
+	
+	@Override
+	protected HttpUriRequest buildGetRequest() {
+		String requestUrl = this.getRequestUrl();
+		requestUrl += "id=";
+		for(String id : this.videosIds){
+			requestUrl += id + ",";
+		}
+		requestUrl = requestUrl.substring(0, requestUrl.length()-1);
+		requestUrl += "&key=" + Config.YOUTUBE_KEY;
+		requestUrl += "&part=snippet";
+
+		return new HttpGet(requestUrl);
+	}
+	
+	@Override
+	protected void onRequestFinished(String response) {
+		try {
+			BaseBuilder builder = new YoutubeVideosList.Builder();
+			YoutubeVideosList videosList = (YoutubeVideosList) builder.buildModel(response);
+			this.listener.onRequestParsingFinished(videosList);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+}

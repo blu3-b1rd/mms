@@ -1,0 +1,91 @@
+package com.myband.sample.fragment;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Bundle;
+import android.support.v4.app.ListFragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+
+import com.myband.sample.R;
+import com.myband.sample.model.BaseModel;
+import com.myband.sample.model.YoutubeVideosList;
+import com.myband.sample.request.BaseRequest.OnRequestFinishedListener;
+import com.myband.sample.request.YoutubeVideosInfoRequest;
+
+public class YoutubeVideosFragment extends ListFragment implements OnRequestFinishedListener {
+
+	private ProgressBar progress;
+	private ViewGroup listContainer;
+	private List<String> videosIds;
+	
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+		return inflater.inflate(R.layout.fragment_youtube_videos, container, false);
+	}
+	
+	@Override
+	public void onViewCreated(View view, Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+		this.videosIds = new ArrayList<String>();
+		this.videosIds.add("7lCDEYXw3mM");
+		this.videosIds.add("5qI1-J8tuRU");
+		
+		this.progress = (ProgressBar) view.findViewById(R.id.progress);
+		this.listContainer = (ViewGroup) view.findViewById(R.id.list_container);
+		this.listContainer.setVisibility(View.GONE);
+		this.progress.setVisibility(View.VISIBLE);
+		
+		new YoutubeVideosInfoRequest(videosIds, this).startRequest();
+	}
+
+	@Override
+	public void onRequestParsingFinished(BaseModel response) {
+		this.progress.setVisibility(View.GONE);
+		this.listContainer.setVisibility(View.VISIBLE);
+		this.getListView().setAdapter(
+				new YoutubeVideosAdapter(this.getActivity(), (YoutubeVideosList) response));
+	}
+	
+	@Override
+	public void onListItemClick(ListView l, View v, int position, long id) {
+		this.getActivity().startActivity(new Intent(Intent.ACTION_VIEW,
+				Uri.parse("http://www.youtube.com/watch?v=" + this.videosIds.get(position))));
+	}
+	
+	private class YoutubeVideosAdapter extends ArrayAdapter<String> {
+
+		private YoutubeVideosList videosList;
+		
+		public YoutubeVideosAdapter(Context context, YoutubeVideosList videosList) {
+			super(context, 0);
+			this.videosList = videosList;
+		}
+		
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			convertView = LayoutInflater.from(this.getContext())
+					.inflate(R.layout.list_item_video, parent, false);
+			((TextView) convertView.findViewById(R.id.video_title)).setText(
+					this.videosList.get(position).getTitle());
+			return convertView;
+		}
+		
+		@Override
+		public int getCount() {
+			return this.videosList.size();
+		}
+		
+	}
+	
+}

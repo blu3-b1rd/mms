@@ -1,0 +1,14 @@
+package com.mms.sample.request;
+
+import org.apache.http.message.BasicNameValuePair;
+
+public class GetDiscography extends BaseRequest {
+
+	private static final String PARAM_COOKIE = "cookie"; 
+	
+	public GetDiscography(String cookie) {
+		super("artist/albums", RequestType.HTTP_GET);
+		this.paramsDictionary.add(new BasicNameValuePair(PARAM_COOKIE, cookie));
+	}
+
+}

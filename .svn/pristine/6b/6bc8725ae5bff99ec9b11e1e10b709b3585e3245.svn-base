@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    
+    <include android:id="@+id/carousel_header_reference"
+        layout="@layout/carousel_header"
+        android:visibility="invisible" />
+    
+    <TextView 
+        android:id="@id/android:empty"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/carousel_header_reference"
+        android:gravity="center"
+        android:text="@string/concerts_empty"
+        android:visibility="gone"/>
+    
+    <FrameLayout
+        android:id="@+id/progress_concerts"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/carousel_header_reference" >
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center" />
+    </FrameLayout>
+    
+    <ListView android:id="@id/android:list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:drawSelectorOnTop="false"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="5dp"/>
+  
+</RelativeLayout>

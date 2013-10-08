@@ -1,0 +1,44 @@
+package com.myband.sample.util;
+
+import java.util.Locale;
+
+import android.annotation.SuppressLint;
+
+import com.myband.sample.R;
+import com.myband.sample.fragment.MeFragment;
+import com.myband.sample.fragment.YoutubeVideosFragment;
+
+public enum HomeSection {
+	ME(R.drawable.ic_action_me, "Me", MeFragment.class),
+	YOUTUBE(R.drawable.ic_action_youtube, "Our Videos", YoutubeVideosFragment.class);
+	
+	private String fragmentTag;
+	private int iconId;
+	private String name;
+	private Class<?> fragmentClass;
+	
+	@SuppressLint("DefaultLocale")
+	private HomeSection(int iconId, String name, Class<?> fragmentClass){
+		this.iconId = iconId;
+		this.name = name;
+		this.fragmentClass = fragmentClass;
+		this.fragmentTag = this.toString().toLowerCase(Locale.getDefault()) + "_fragment";
+	}
+
+	public String getFragmentTag(){
+		return this.fragmentTag;
+	}
+	
+	public int getIconId(){
+		return this.iconId;
+	}
+	
+	public String getName(){
+		return this.name;
+	}
+	
+	public Class<?> getFragmentClass(){
+		return this.fragmentClass;
+	}
+	
+}

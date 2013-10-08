@@ -1,0 +1,72 @@
+package com.mms.app.fragment;
+
+import android.content.Context;
+import android.os.Bundle;
+import android.support.v4.app.ListFragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
+
+import com.mms.app.R;
+import com.mms.app.util.HomeSection;
+import com.mms.app.util.OnHomeSectionSelectedListener;
+
+public class HomeOptionsFragment extends ListFragment {
+	
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+		return inflater.inflate(R.layout.fragment_home_sections, container, false);
+	}
+	
+	@Override
+	public void onViewCreated(View view, Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+		this.getListView().setAdapter(new HomeOptionsAdapter(this.getActivity()));
+	}
+	
+	@Override
+	public void onListItemClick(ListView l, View v, int position, long id) {
+		super.onListItemClick(l, v, position, id);
+		try {
+			((OnHomeSectionSelectedListener) this.getActivity())
+				.onHomeSectionSelected(HomeSection.values()[position]);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private static final class HomeOptionsAdapter extends ArrayAdapter<String> {
+		
+        public HomeOptionsAdapter(Context context) {
+            super(context, 0);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            if (convertView == null) {
+            	convertView = LayoutInflater.from(this.getContext())
+            			.inflate(R.layout.list_item_section, parent, false);
+            }
+            
+            HomeSection option = HomeSection.values()[position];
+            ((ImageView) convertView.findViewById(R.id.option_icon)).setImageResource(
+            		option.getIconId());
+            ((TextView) convertView.findViewById(R.id.option_name)).setText(
+            		option.getName());
+            
+            return convertView;
+        }
+
+        @Override
+        public int getCount() {
+        	return HomeSection.values().length;
+        }
+
+    }
+	
+}

@@ -1,0 +1,10 @@
+package com.myband.sample.model;
+
+
+public interface BaseModel {
+
+	public abstract class BaseBuilder {
+		public abstract BaseModel buildModel(String input) throws Exception;
+	}
+
+}

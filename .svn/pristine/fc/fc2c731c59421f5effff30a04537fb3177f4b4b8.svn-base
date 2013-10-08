@@ -1,0 +1,141 @@
+package com.myband.sample.fragment;
+
+import java.lang.ref.WeakReference;
+import java.util.Arrays;
+
+import android.app.Activity;
+import android.content.Context;
+import android.os.Bundle;
+import android.support.v4.app.ListFragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.ListView;
+
+import com.android.tabcarousel.BackScrollManager;
+import com.android.tabcarousel.CarouselContainer;
+import com.myband.sample.R;
+
+public class ConcertsListFragment extends ListFragment {
+	
+	private CarouselContainer carousel;
+
+	private static final String[] MOVIES = new String[] { "A Separation" };
+	
+	@Override
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
+		this.carousel = (CarouselContainer) activity
+				.findViewById(R.id.carousel_header);
+	}
+	
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+		Arrays.sort(MOVIES);
+		CarouselListAdapter adapter = new CarouselListAdapter(this.getActivity());
+		for(String movie : MOVIES){
+			adapter.add(movie);
+		}
+		this.setListAdapter(adapter);
+		return inflater.inflate(R.layout.fragment_concerts_list, container, false);
+	}
+
+	@Override
+	public void onViewCreated(View view, Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+		ListView listView = this.getListView();
+		listView.setOnScrollListener(new BackScrollManager(this.carousel, null,
+				CarouselContainer.TAB_INDEX_FIRST));
+		listView.setVerticalScrollBarEnabled(false);
+	}
+	
+	private static final class CarouselListAdapter extends ArrayAdapter<String> {
+
+        private static final int ITEM_VIEW_TYPE_HEADER = 0;
+        private static final int ITEM_VIEW_TYPE_DATA = 1;
+        private static final int VIEW_TYPE_COUNT = 2;
+        private final View mHeader;
+
+        public CarouselListAdapter(Context context) {
+            super(context, 0);
+            // Inflate the fake header
+            mHeader = LayoutInflater.from(context).inflate(R.layout.faux_carousel, null);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            // Return a faux header at position 0
+            if (position == 0) {
+                return mHeader;
+            }
+
+            // Recycle ViewHolder's items
+            ViewHolder holder;
+            if (convertView == null) {
+                //convertView = LayoutInflater.from(getContext()).inflate(
+                //        android.R.layout.simple_list_item_1, parent, false);
+                //holder = new ViewHolder(convertView);
+                //convertView.setTag(holder);
+            	convertView = LayoutInflater.from(this.getContext())
+            			.inflate(R.layout.list_item_events, parent, false);
+            	holder = new ViewHolder(convertView);
+            	convertView.setTag(holder);
+            } else {
+                holder = (ViewHolder) convertView.getTag();
+            }
+            
+            //final String movies = getItem(position - 1);
+            //holder.mLineOne.get().setText(movies);
+            return convertView;
+        }
+
+        @Override
+        public boolean hasStableIds() {
+            return true;
+        }
+
+        @Override
+        public int getCount() {
+        	if(MOVIES.length == 0){
+        		return 0;
+        	} else {
+        		return MOVIES.length + 1;
+        	}
+        }
+
+        @Override
+        public long getItemId(int position) {
+            if (position == 0) {
+                return -1;
+            }
+            return position - 1;
+        }
+
+        @Override
+        public int getViewTypeCount() {
+            return VIEW_TYPE_COUNT;
+        }
+
+        @Override
+        public int getItemViewType(int position) {
+            if (position == 0) {
+                return ITEM_VIEW_TYPE_HEADER;
+            }
+            return ITEM_VIEW_TYPE_DATA;
+        }
+    }
+
+    private static final class ViewHolder {
+
+        public WeakReference<ImageView> mLineOne;
+
+        public ViewHolder(View view) {
+            mLineOne = new WeakReference<ImageView>((ImageView) view.findViewById(R.id.venue_image));
+        }
+
+    }
+	
+}

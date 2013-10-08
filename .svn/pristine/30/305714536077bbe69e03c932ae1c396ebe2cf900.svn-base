@@ -1,0 +1,14 @@
+package com.bandtastic.sampleband.model;
+
+public class EventBand implements BaseModel {
+
+	public static class Builder implements BaseBuilder {
+		@Override
+		public BaseModel buildModel() {
+			// TODO 
+			return null;
+		}
+		
+	}
+	
+}

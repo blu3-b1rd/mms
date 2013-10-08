@@ -1,0 +1,251 @@
+package com.myband.sample;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Random;
+
+import android.animation.Animator;
+import android.animation.AnimatorInflater;
+import android.content.Intent;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
+
+import com.facebook.Session;
+import com.facebook.Session.StatusCallback;
+import com.facebook.SessionState;
+import com.facebook.UiLifecycleHelper;
+
+public class SplashActivity extends FragmentActivity implements AnimationListener,
+	OnPageChangeListener, Handler.Callback, StatusCallback {
+	
+	private int[] imagesIds = {R.drawable.splash_1, R.drawable.splash_2,
+			R.drawable.splash_3, R.drawable.splash_4,
+			R.drawable.splash_5, R.drawable.splash_6};
+	private int[] animIds = {R.anim.appear_to_bottom_right,
+			R.anim.appear_to_bottom_right, R.anim.appear_to_bottom_right};
+	
+	private ViewPager imagesPager;
+	private boolean initiated = false;
+	private UiLifecycleHelper uiHelper;
+	private Animator winkAnimation;
+	
+	private static Handler slideMessageHandler;
+	
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_splash);
+		this.init();
+		this.uiHelper.onCreate(savedInstanceState);
+	}
+	
+	private void init(){
+		slideMessageHandler = new Handler(this);
+		this.imagesPager = (ViewPager) this.findViewById(R.id.images_slider);
+		this.imagesPager.setAdapter(new SplashImagesAdapter(this.getSupportFragmentManager()));
+		this.imagesPager.setOnPageChangeListener(this);
+		this.uiHelper = new UiLifecycleHelper(this, this);
+		this.winkAnimation = AnimatorInflater.loadAnimator(this, R.animator.wink);
+		if(Session.getActiveSession() != null && Session.getActiveSession().isOpened()){
+			this.showLoggedMessage();
+		} else if(Session.getActiveSession() == null || Session.getActiveSession().isClosed()) {
+			this.showLoginOptions();
+		}
+	}
+	
+	private void startPagerAnimation(){
+		Random randomGenerator = new Random(Calendar.getInstance().getTimeInMillis());
+		Animation anim = AnimationUtils.loadAnimation(this,
+				this.animIds[randomGenerator.nextInt(animIds.length)]);
+		anim.setAnimationListener(this);
+		SplashImagesAdapter adapter = (SplashImagesAdapter) this.imagesPager.getAdapter();
+		adapter.getFragment(this.imagesPager.getCurrentItem()).animateImage(anim);
+	}
+	
+	@Override
+	public void onPageSelected(int position) {
+		this.startPagerAnimation();
+	}
+	@Override public void onPageScrolled(int arg0, float arg1, int arg2) {}
+	@Override public void onPageScrollStateChanged(int arg0) {}
+
+	@Override
+	public void onAnimationEnd(Animation animation) {
+		try {
+			Random randomGenerator = new Random(Calendar.getInstance().getTimeInMillis());
+			int nextItem = 0;
+			do {
+				nextItem = randomGenerator.nextInt(this.imagesIds.length-1);
+			} while(nextItem == this.imagesPager.getCurrentItem());
+			final int ni = nextItem;
+			this.imagesPager.post(new Runnable() {
+				@Override
+				public void run() {
+					imagesPager.setCurrentItem(ni);
+				}
+			});
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	@Override public void onAnimationRepeat(Animation animation) {}
+	@Override public void onAnimationStart(Animation animation) {}
+	
+	private class SplashImagesAdapter extends FragmentStatePagerAdapter {
+
+		private List<SlideFragment> slidesFragments;
+		
+		public SplashImagesAdapter(FragmentManager fm) {
+			super(fm);
+			this.slidesFragments = new ArrayList<SlideFragment>();
+			for(int i = 0 ; i < imagesIds.length ; i++){
+				SlideFragment fragment = new SlideFragment();
+				fragment.setResourceId(imagesIds[i]);
+				this.slidesFragments.add(fragment);
+			}
+		}
+
+		@Override
+		public Fragment getItem(int position) {
+			return this.slidesFragments.get(position);
+		}
+
+		@Override
+		public int getCount() {
+			return this.slidesFragments.size();
+		}
+		
+		public SlideFragment getFragment(int index){
+			return this.slidesFragments.get(index);
+		}
+		
+	}
+	
+	public static class SlideFragment extends Fragment {
+		
+		private int resourceId;
+		private ImageView imageSlide;
+		
+		public void setResourceId(int resourceId){
+			this.resourceId = resourceId;
+		}
+		
+		@Override
+		public View onCreateView(LayoutInflater inflater, ViewGroup container,
+				Bundle savedInstanceState) {
+			super.onCreateView(inflater, container, savedInstanceState);
+			return inflater.inflate(R.layout.fragment_slide, container, false);
+		}
+		
+		@Override
+		public void onViewCreated(View view, Bundle savedInstanceState) {
+			super.onViewCreated(view, savedInstanceState);
+			this.imageSlide = (ImageView) view.findViewById(R.id.image_slide);
+			this.imageSlide.setImageResource(this.resourceId);
+			Message.obtain(slideMessageHandler).sendToTarget();
+		}
+		
+		public void animateImage(Animation anim){
+			if(this.imageSlide != null){
+				imageSlide.startAnimation(anim);
+			}
+		}
+		
+	}
+
+	@Override
+	public boolean handleMessage(Message msg) {
+		if(!this.initiated){
+			this.initiated = true;
+			this.startPagerAnimation();
+		}
+		return true;
+	}
+
+	@SuppressWarnings("static-access")
+	@Override
+	public void call(Session session, SessionState state, Exception exception) {
+		if(session != null && session.getActiveSession().isOpened()){
+			this.showLoggedMessage();
+		} else if(session == null || session.getActiveSession().isClosed()){
+			this.showLoginOptions();
+		}
+	}
+	
+	public void goToHomeScreen(View view){
+		if(Session.getActiveSession().isOpened()){
+			this.startActivity(new Intent(this, HomeActivity.class));
+			this.finish();
+		} else {
+			this.showLoginOptions();
+		}
+	}
+	
+	private void showLoginOptions(){
+		this.findViewById(R.id.splash_progress).setVisibility(View.GONE);
+		this.findViewById(R.id.login_options_container).setVisibility(View.VISIBLE);
+	}
+	
+	private void showLoggedMessage(){
+		this.findViewById(R.id.splash_progress).setVisibility(View.GONE);
+		this.findViewById(R.id.login_options_container).setVisibility(View.GONE);
+		this.findViewById(R.id.logged_message).setVisibility(View.VISIBLE);
+		this.winkAnimation.setTarget(this.findViewById(R.id.logged_message));
+		this.winkAnimation.start();
+	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		this.uiHelper.onResume();
+	}
+	
+	@Override
+	protected void onStart() {
+		super.onStart();
+	}
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		this.uiHelper.onActivityResult(requestCode, resultCode, data);
+	}
+	
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		this.uiHelper.onSaveInstanceState(outState);
+	};
+	
+	@Override
+	protected void onPause() {
+		super.onPause();
+		this.uiHelper.onPause();
+	}
+	
+	@Override
+	protected void onStop() {
+		super.onStop();
+	}
+	
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		this.uiHelper.onDestroy();
+	}
+	
+}

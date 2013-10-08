@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    
+    <include android:id="@+id/carousel_header_reference"
+        layout="@layout/carousel_header"
+        android:visibility="invisible" />
+    
+    <ListView android:id="@id/android:list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:drawSelectorOnTop="false"
+        android:divider="@android:color/transparent"
+        android:fastScrollEnabled="true"
+        android:layout_margin="15dp" />
+    
+    <TextView android:id="@id/android:empty"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/carousel_header_reference"
+        android:text="@string/news_empty"
+        android:gravity="center"/>
+        
+</RelativeLayout>

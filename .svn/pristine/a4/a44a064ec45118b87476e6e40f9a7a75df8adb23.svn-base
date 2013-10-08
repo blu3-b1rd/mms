@@ -1,0 +1,116 @@
+package com.bandtastic.sampleband.fragment;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+import com.android.tabcarousel.CarouselContainer;
+import com.android.tabcarousel.CarouselPagerAdapter;
+import com.android.tabcarousel.R;
+
+public class NewsSectionFragment extends Fragment {
+
+	private CarouselContainer carousel;
+	private ViewPager carouselPager;
+	
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+		return inflater.inflate(R.layout.carousel_container, container, false);
+	}
+	
+	@Override
+	public void onViewCreated(View view, Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+		this.init(view);
+	}
+	
+	private void init(View view){
+		this.carousel = (CarouselContainer) view.findViewById(R.id.carousel_header);
+		this.carouselPager = (ViewPager) view.findViewById(R.id.carousel_pager);
+		this.configure();
+	}
+	
+	private void configure(){
+		this.carousel.setUsesDualTabs(true);
+		// TODO change Strings for resources
+		this.carousel.setLabel(CarouselContainer.TAB_INDEX_FIRST, "News");
+		this.carousel.setLabel(CarouselContainer.TAB_INDEX_SECOND, "Concerts");
+		
+		this.carousel.setImageResource(CarouselContainer.TAB_INDEX_FIRST, com.myband.sample.R.drawable.news);
+		this.carousel.setImageResource(CarouselContainer.TAB_INDEX_SECOND, com.myband.sample.R.drawable.concerts);
+		
+		this.carouselPager.setPageTransformer(true, new DepthPageTransformer());
+		this.carouselPager.setOnPageChangeListener(
+				new CarouselPagerAdapter(this.carouselPager, this.carousel));
+		this.carouselPager.setAdapter(new NewsPagerAdapter(this.getFragmentManager()));
+	}
+	
+	private class NewsPagerAdapter extends FragmentPagerAdapter {
+
+		private List<Fragment> newsFragments = new ArrayList<Fragment>();
+		
+		public NewsPagerAdapter(FragmentManager fm) {
+			super(fm);
+			this.newsFragments.add(new NewsListFragment());
+			this.newsFragments.add(new ConcertsListFragment());
+		}
+
+		@Override
+		public Fragment getItem(int position) {
+			return this.newsFragments.get(position);
+		}
+
+		@Override
+		public int getCount() {
+			return this.newsFragments.size();
+		}
+		
+	}
+	
+	public class DepthPageTransformer implements ViewPager.PageTransformer {
+	    private float MIN_SCALE = 0.75f;
+
+	    public void transformPage(View view, float position) {
+	        int pageWidth = view.getWidth();
+
+	        if (position < -1) { // [-Infinity,-1)
+	            // This page is way off-screen to the left.
+	            view.setAlpha(0);
+
+	        } else if (position <= 0) { // [-1,0]
+	            // Use the default slide transition when moving to the left page
+	            view.setAlpha(1);
+	            view.setTranslationX(0);
+	            view.setScaleX(1);
+	            view.setScaleY(1);
+
+	        } else if (position <= 1) { // (0,1]
+	            // Fade the page out.
+	            view.setAlpha(1 - position);
+
+	            // Counteract the default slide transition
+	            view.setTranslationX(pageWidth * -position);
+
+	            // Scale the page down (between MIN_SCALE and 1)
+	            float scaleFactor = MIN_SCALE
+	                    + (1 - MIN_SCALE) * (1 - Math.abs(position));
+	            view.setScaleX(scaleFactor);
+	            view.setScaleY(scaleFactor);
+
+	        } else { // (1,+Infinity]
+	            // This page is way off-screen to the right.
+	            view.setAlpha(0);
+	        }
+	    }
+	}
+	
+}

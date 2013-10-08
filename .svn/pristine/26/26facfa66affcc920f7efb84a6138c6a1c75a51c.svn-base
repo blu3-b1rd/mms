@@ -1,0 +1,22 @@
+package com.bandtastic.sampleband.model;
+
+import java.util.Calendar;
+import java.util.List;
+
+public class EventEntry implements BaseModel {
+	
+	private String name;
+	private String venue;
+	private Calendar date;
+	private List<String> otherBands;
+	
+	public static class Builder implements BaseBuilder{
+		@Override
+		public BaseModel buildModel() {
+			// TODO
+			return null;
+		}
+		
+	}
+	
+}

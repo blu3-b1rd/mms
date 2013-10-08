@@ -1,0 +1,16 @@
+package com.myband.sample.model;
+
+import java.io.InputStream;
+
+public class EventBand implements BaseModel {
+
+	public static class Builder extends BaseBuilder {
+		@Override
+		public BaseModel buildModel(String input) throws Exception {
+			// TODO 
+			return null;
+		}
+		
+	}
+	
+}

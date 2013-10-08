@@ -1,0 +1,106 @@
+package com.mms.sample.model;
+
+import org.json.JSONObject;
+
+public class MMSAlbum implements MMSModel {
+
+	private int id;
+	private String name;
+	private String releaseDate;
+	private int numberOfTracks;
+	private String albumCoverUrl;
+	private String label;
+	private int rating;
+
+	private MMSAlbum() {
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	private void setId(int id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	private void setName(String name) {
+		this.name = name;
+	}
+
+	public String getReleaseDate() {
+		return releaseDate;
+	}
+
+	private void setReleaseDate(String releaseDate) {
+		this.releaseDate = releaseDate;
+	}
+
+	public int getNumberOfTracks() {
+		return numberOfTracks;
+	}
+
+	private void setNumberOfTracks(int numberOfTracks) {
+		this.numberOfTracks = numberOfTracks;
+	}
+
+	public String getAlbumCoverUrl() {
+		return albumCoverUrl;
+	}
+
+	private void setAlbumCoverUrl(String albumCoverUrl) {
+		this.albumCoverUrl = albumCoverUrl;
+	}
+
+	public String getLabel() {
+		return label;
+	}
+
+	private void setLabel(String label) {
+		this.label = label;
+	}
+
+	public int getRating() {
+		return rating;
+	}
+
+	private void setRating(int rating) {
+		this.rating = rating;
+	}
+
+	public static class Builder extends MMSBuilder {
+
+		private final String TAG_ID = "albumId";
+		private final String TAG_NAME = "name";
+		private final String TAG_RELEASE_DATE = "releaseDate";
+		private final String TAG_NUMBER_OF_TRACKS = "numberOfTracks";
+		private final String TAG_ALBUM_COVER = "coverImage";
+		private final String TAG_LABEL = "label";
+		private final String TAG_RATING = "rating";
+		
+		public Builder(String modelType) {
+			super(modelType);
+		}
+
+		@Override
+		public MMSModel build(String input) throws Exception {
+			JSONObject jsonAlbum = new JSONObject(input);
+			MMSAlbum album = new MMSAlbum();
+			
+			album.setId(jsonAlbum.getInt(TAG_ID));
+			album.setName(jsonAlbum.getString(TAG_NAME));
+			album.setReleaseDate(jsonAlbum.getString(TAG_RELEASE_DATE));
+			album.setNumberOfTracks(jsonAlbum.getInt(TAG_NUMBER_OF_TRACKS));
+			album.setAlbumCoverUrl(jsonAlbum.getString(TAG_ALBUM_COVER));
+			album.setLabel(jsonAlbum.getString(TAG_LABEL));
+			album.setRating(jsonAlbum.getInt(TAG_RATING));
+			
+			return album;
+		}
+
+	}
+
+}

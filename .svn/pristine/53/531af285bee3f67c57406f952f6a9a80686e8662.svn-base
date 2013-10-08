@@ -1,0 +1,130 @@
+package com.mms.app;
+
+import android.content.Context;
+import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.Toast;
+
+import com.mms.MMSConfig;
+import com.mms.MMSActivity;
+import com.mms.MMSApplication;
+import com.mms.MMSPreferences;
+import com.mms.model.MMSGalleryItem;
+import com.mms.model.MMSList;
+import com.mms.model.MMSModel;
+import com.mms.model.MMSResponse;
+import com.mms.request.GetArtistGallery;
+import com.mms.request.MMSAsyncRequest;
+import com.mms.request.MMSAsyncRequest.OnMMSRequestFinishedListener;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
+
+public class GallerySectionActivity extends ActionBarActivity
+	implements OnMMSRequestFinishedListener {
+	
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		this.setContentView(R.layout.activity_gallery);
+		String cookie = MMSPreferences.loadString(MMSPreferences.COOKIE, null);
+		new MMSAsyncRequest(this).execute(new GetArtistGallery(cookie));
+	}
+
+	@Override
+	public void onMMSRequestFinished(MMSResponse response) {
+		this.findViewById(R.id.progress).setVisibility(View.GONE);
+		try {
+			switch(response.getStatus()){
+			case MMSActivity.MMS_SUCCESS:
+				this.onSuccessfulResponse(response);
+				break;
+			case MMSActivity.MMS_WRONG_COOKIE:
+				this.onWrongCookie();
+				break;
+			default:
+				this.onErrorResponse(response);
+				break;
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+			this.onRequestFailed();
+		}
+	}
+	
+	protected void onSuccessfulResponse(MMSResponse response){
+	}
+	
+	protected void onRequestFailed(){
+		Toast.makeText(this, "Connection Failed",
+				Toast.LENGTH_SHORT).show();
+	}
+	
+	protected void onWrongCookie(){
+		Toast.makeText(this, "Login again. Wrong Cookie",
+				Toast.LENGTH_SHORT).show();
+		((MMSApplication) this.getApplication()).logout(this);
+	}
+	
+	protected void onErrorResponse(MMSResponse response) {
+		Toast.makeText(this, response.getMessage(),
+				Toast.LENGTH_SHORT).show();
+	}
+
+	private class GalleryAdapter extends ArrayAdapter<MMSModel> {
+		
+		private MMSList gallery;
+		private DisplayImageOptions options;
+		private ImageLoader imageLoader = ImageLoader.getInstance();
+		
+		public GalleryAdapter(Context context, MMSList gallery){
+			super(context, R.layout.list_item_gallery, gallery);
+			this.gallery = gallery;
+			this.options = new DisplayImageOptions.Builder()
+				.displayer(new FadeInBitmapDisplayer(800))
+				.showStubImage(R.drawable.default_album_art)
+				.showImageForEmptyUri(R.drawable.default_album_art)
+				.showImageOnFail(R.drawable.default_album_art)
+				.cacheInMemory()
+				.build();
+		}
+		
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			View view = convertView;
+			
+			view = LayoutInflater.from(this.getContext()).inflate(
+					R.layout.list_item_gallery, parent, false);
+			
+			MMSGalleryItem item = (MMSGalleryItem) this.gallery
+					.get(position % this.gallery.size());
+			
+			try {
+				this.imageLoader.displayImage(
+						MMSConfig.MMS_BASE_IMAGE_URL + item.getUrl(),
+						(ImageView) view, this.options);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+			return view;
+		}
+		
+		@Override
+		public MMSModel getItem(int position) {
+			return this.gallery.get(position);
+		}
+		
+		@Override
+		public int getCount() {
+			return this.gallery.size() * 5;
+		}
+		
+	}
+	
+}

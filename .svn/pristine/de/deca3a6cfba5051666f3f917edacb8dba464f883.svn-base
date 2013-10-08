@@ -1,0 +1,136 @@
+package com.myband.sample.request;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.impl.client.DefaultHttpClient;
+
+import android.os.AsyncTask;
+
+import com.myband.sample.model.BaseModel;
+
+public abstract class BaseRequest {
+
+	public interface OnRequestFinishedListener {
+		public void onRequestParsingFinished(BaseModel response);
+	}
+	
+	public enum RequestType {
+		HTTP_GET, HTTP_POST;
+	}
+
+	protected List<NameValuePair> paramsList;
+	private String requestUrl;
+	private String methodName;
+	private RequestType requestType;
+
+	protected BaseRequest(String baseUrl, String methodName,
+			RequestType requestType) {
+		this.requestUrl = baseUrl;
+		this.methodName = methodName;
+		this.requestType = requestType;
+		this.paramsList = new ArrayList<NameValuePair>();
+	}
+
+	public void startRequest() {
+		HttpUriRequest request = null;
+		this.requestUrl = this.concatMethodName();
+		switch (this.requestType) {
+		case HTTP_GET:
+			request = this.buildGetRequest();
+			// TODO
+			break;
+		case HTTP_POST:
+			request = this.buildPostRequest();
+			// TODO
+			break;
+		}
+
+		new RequestAsync().execute(request);
+	}
+
+	protected String concatMethodName() {
+		// TODO
+		return "";
+	}
+
+	protected HttpUriRequest buildPostRequest() {
+		// TODO
+		return null;
+	}
+
+	protected HttpUriRequest buildGetRequest() {
+		// TODO
+		//String url = URLEncodedUtils.format(this.paramsList, "UTF-8");
+
+		return null;
+	}
+
+	protected String getRequestUrl() {
+		return this.requestUrl;
+	}
+
+	protected String getMethodName() {
+		return this.methodName;
+	}
+
+	private class RequestAsync extends
+			AsyncTask<HttpUriRequest, Integer, String> {
+		@Override
+		protected String doInBackground(HttpUriRequest... params) {
+			InputStream content = null;
+
+			try {
+				HttpUriRequest request = params[0];
+				HttpClient client = new DefaultHttpClient();
+				HttpResponse response = client.execute(request);
+				content = response.getEntity().getContent();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+			return streamToString(content);
+		}
+
+		@Override
+		protected void onPostExecute(String result) {
+			onRequestFinished(result);
+		}
+	}
+
+	private String streamToString(InputStream input) {
+		BufferedReader br = null;
+		StringBuilder sb = new StringBuilder();
+
+		String line;
+		try {
+			br = new BufferedReader(new InputStreamReader(input));
+			while ((line = br.readLine()) != null) {
+				sb.append(line);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (br != null) {
+				try {
+					br.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
+		return sb.toString();
+	}
+
+	protected abstract void onRequestFinished(String response);
+
+}

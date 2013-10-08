@@ -1,0 +1,152 @@
+package com.mms.app;
+
+import android.content.Context;
+import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
+
+import com.mms.MMSActivity;
+import com.mms.MMSPreferences;
+import com.mms.app.fragment.dialog.AlbumArtDialogFragment;
+import com.mms.model.MMSAlbum;
+import com.mms.model.MMSList;
+import com.mms.model.MMSModel;
+import com.mms.model.MMSResponse;
+import com.mms.model.MMSTrack;
+import com.mms.request.GetAlbumTracksRequest;
+import com.mms.request.MMSAsyncRequest;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+
+public class AlbumActivity extends MMSActivity {
+
+	public static final String META_ALBUM = "meta_album";
+	private static final String TAG_ALBUM_ART_DIALOG = "album_art_dialog";
+	
+	private MMSAlbum mAlbum;
+	private DisplayImageOptions options;
+	
+	private ImageView albumArt;
+	private TextView releaseDate;
+	private TextView label;
+	private TextView albumName;
+	private ListView tracksList;
+	
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		this.setContentView(R.layout.activity_album);
+		this.mAlbum = (MMSAlbum) this.getIntent().getExtras().getSerializable(META_ALBUM);
+		String cookie = MMSPreferences.loadString(MMSPreferences.COOKIE, null);
+		new MMSAsyncRequest(this).execute(new GetAlbumTracksRequest(
+				cookie, this.mAlbum.getId()));
+		this.configure();
+		this.setData();
+	}
+	
+	private void configure(){
+		this.albumArt = (ImageView) this.findViewById(R.id.album_art);
+		this.releaseDate = (TextView) this.findViewById(R.id.lbl_release_date);
+		this.label = (TextView) this.findViewById(R.id.label);
+		this.albumName = (TextView) this.findViewById(R.id.lbl_album_name);
+		this.tracksList = (ListView) this.findViewById(android.R.id.list);
+		
+		this.options = new DisplayImageOptions.Builder()
+			.showStubImage(R.drawable.default_album_art)
+			.showImageForEmptyUri(R.drawable.default_album_art)
+			.showImageOnFail(R.drawable.default_album_art)
+			.cacheInMemory()
+			.build();
+	}
+	
+	private void setData(){
+		ImageLoader.getInstance().displayImage(this.mAlbum.getCoverUrl(), this.albumArt, this.options);
+		this.releaseDate.setText(this.mAlbum.getReleaseDate());
+		this.label.setText(this.mAlbum.getLabel());
+		this.albumName.setText(this.mAlbum.getName());
+	}
+	
+	@Override
+	public void onSuccessfulResponse(MMSResponse response) {
+		this.findViewById(R.id.progress).setVisibility(View.GONE);
+		this.tracksList.setVisibility(View.VISIBLE);
+		this.tracksList.setAdapter(new TrackListAdapter(this, (MMSList) response.getContent()));
+	}
+	
+	public void onAlbumArtClicked(View view){
+		FragmentTransaction transaction = this.getSupportFragmentManager().beginTransaction();
+		Fragment prevDialog = this.getSupportFragmentManager().findFragmentByTag(TAG_ALBUM_ART_DIALOG);
+		
+		if(prevDialog != null){
+			transaction.remove(prevDialog);
+		}
+		transaction.commit();
+		
+		Bundle metaData = new Bundle();
+		metaData.putSerializable(AlbumArtDialogFragment.META_ALBUM, this.mAlbum);
+		DialogFragment dialog = new AlbumArtDialogFragment();
+		dialog.setArguments(metaData);
+		dialog.show(this.getSupportFragmentManager(), TAG_ALBUM_ART_DIALOG);
+	}
+	
+	private class TrackListAdapter extends ArrayAdapter<MMSModel> {
+		
+		private MMSList tracksList;
+		
+		private class ViewHolder {
+			public TextView trackNumber;
+			public TextView trackName;
+			public TextView trackDuration;
+		}
+		
+		public TrackListAdapter(Context context, MMSList tracksList) {
+			super(context, R.layout.list_item_track, tracksList);
+			this.tracksList = tracksList;
+		}
+		
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			View view = convertView;
+			final ViewHolder holder;
+			
+			if(view == null){
+				view = LayoutInflater.from(this.getContext()).inflate(R.layout.list_item_track, parent, false);
+				holder = new ViewHolder();
+				holder.trackNumber = (TextView) view.findViewById(R.id.track_number);
+				holder.trackName = (TextView) view.findViewById(R.id.track_name);
+				holder.trackDuration = (TextView) view.findViewById(R.id.track_duration);
+				view.setTag(holder);
+			} else {
+				holder = (ViewHolder) view.getTag();
+			}
+			
+			MMSTrack current = (MMSTrack) this.tracksList.get(position);
+			
+			holder.trackNumber.setText(current.getTrackNumber() + ". ");
+			holder.trackName.setText(current.getName());
+			holder.trackDuration.setText(current.getDuration());
+			
+			return view;
+		}
+		
+		@Override
+		public int getCount() {
+			return this.tracksList.size();
+		}
+		
+		@Override
+		public MMSModel getItem(int position) {
+			return this.tracksList.get(position);
+		}
+		
+	}
+
+}

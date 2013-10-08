@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="20dip"
+    android:paddingTop="20dip"
+    android:layout_marginBottom="20dip"
+    android:paddingBottom="20dip">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+    	android:background="@drawable/bg_news_dialog">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="150dip"
+                android:scaleType="centerCrop"
+                android:src="@drawable/news"
+                android:contentDescription="@null" />
+            
+            <FrameLayout 
+                android:layout_width="match_parent"
+                android:layout_height="150dip"
+                android:background="@drawable/gradient_layer"/>
+            
+            <TextView 
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:textSize="25sp"
+                android:layout_alignParentBottom="true"
+                android:text="Thank you and news"
+                android:textStyle="bold"
+                android:textColor="#AAFFFFFF"/>
+        </RelativeLayout>
+        
+        <TextView 
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Thank you to everyone who attended our recent benefit / release show for the silver tongue LP in London. We raised £400 for Rape Crisis. This year will be quite quiet, we are playing Alerta Death fest, a DIY festival in Hanover Germany, and we have tentative plans for a small tour in europe in September. There will be a special edition DLP of Silver tongue later this year, its a current work in progress. Thank you to everyone who has taken time to listen to our music, and words.\n\nLB x"
+            android:textColor="#AAFFFFFF"
+            android:padding="5dip"/>
+        
+    </LinearLayout>
+
+</ScrollView>

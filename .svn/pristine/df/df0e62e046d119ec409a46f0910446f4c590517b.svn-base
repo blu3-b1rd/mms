@@ -1,0 +1,23 @@
+package com.myband.sample.model;
+
+import java.io.InputStream;
+import java.util.Calendar;
+import java.util.List;
+
+public class EventEntry implements BaseModel {
+	
+	private String name;
+	private String venue;
+	private Calendar date;
+	private List<String> otherBands;
+	
+	public static class Builder extends BaseBuilder{
+		@Override
+		public BaseModel buildModel(String input) throws Exception {
+			// TODO
+			return null;
+		}
+		
+	}
+	
+}

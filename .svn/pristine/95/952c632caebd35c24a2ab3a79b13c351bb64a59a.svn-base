@@ -1,0 +1,10 @@
+package com.mms.sample.util;
+
+public class Config {
+
+	public static final String ARTIST_ALIAS = "Test_Artist";
+	public static final String YOUTUBE_KEY = "AIzaSyCELQonGwekji_lYaq2gwBrVc06CyysUwM";
+	public static final String MMS_BASE_URL = "http://musicmultimediastore.com/api/";
+	//public static final String MMS_BASE_URL = "http://25.41.97.154/api/";
+	
+}

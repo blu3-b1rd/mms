@@ -1,0 +1,118 @@
+package com.mms.model;
+
+import org.json.JSONObject;
+
+public class MMSTrack implements MMSModel {
+
+	private static final long serialVersionUID = -4139432505215117878L;
+	
+	private int id;
+	private String name;
+	private int trackNumber;
+	private int artistId;
+	private String duration;
+	private String price;
+	private int rating;
+	private int albumId;
+
+	private MMSTrack(){}
+	
+	public int getId() {
+		return id;
+	}
+
+	private void setId(int id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	private void setName(String name) {
+		this.name = name;
+	}
+	
+	public int getTrackNumber(){
+		return this.trackNumber;
+	}
+	
+	private void setTrackNumber(int trackNumber){
+		this.trackNumber = trackNumber;
+	}
+
+	public int getArtistId() {
+		return artistId;
+	}
+
+	private void setArtistId(int artistId) {
+		this.artistId = artistId;
+	}
+
+	public String getDuration() {
+		return duration;
+	}
+
+	private void setDuration(String duration) {
+		this.duration = duration;
+	}
+
+	public String getPrice() {
+		return price;
+	}
+
+	private void setPrice(String price) {
+		this.price = price;
+	}
+
+	public int getRating() {
+		return rating;
+	}
+
+	private void setRating(int rating) {
+		this.rating = rating;
+	}
+
+	public int getAlbumId() {
+		return albumId;
+	}
+
+	private void setAlbumId(int albumId) {
+		this.albumId = albumId;
+	}
+
+	public static class Builder extends MMSBuilder {
+
+		private final String TAG_ID = "trackId";
+		private final String TAG_NAME = "name";
+		private final String TAG_TRACK_NUMBER = "trackNumber";
+		private final String TAG_ARTIST_ID = "artistId";
+		private final String TAG_DURATION = "duration";
+		private final String TAG_PRICE = "price";
+		private final String TAG_RATING = "rating";
+		private final String TAG_ALBUM_ID = "albumId";
+
+		public Builder(String modelType) {
+			super(modelType);
+		}
+
+		@Override
+		public MMSModel build(String input) throws Exception {
+			JSONObject jsonTrack = new JSONObject(input);
+			MMSTrack track = new MMSTrack();
+			
+			track.setId(jsonTrack.getInt(TAG_ID));
+			track.setName(jsonTrack.getString(TAG_NAME));
+			track.setTrackNumber(jsonTrack.getInt(TAG_TRACK_NUMBER));
+			track.setArtistId(jsonTrack.getInt(TAG_ARTIST_ID));
+			track.setDuration(jsonTrack.getString(TAG_DURATION));
+			track.setPrice(jsonTrack.getString(TAG_PRICE));
+			track.setRating(jsonTrack.getInt(TAG_RATING));
+			track.setAlbumId(jsonTrack.getInt(TAG_ALBUM_ID));
+			
+			return track;
+		}
+
+	}
+
+}

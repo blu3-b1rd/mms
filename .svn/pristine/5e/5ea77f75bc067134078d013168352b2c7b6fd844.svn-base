@@ -1,0 +1,60 @@
+package com.myband.sample.model;
+
+import java.util.ArrayList;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+public class YoutubeVideosList extends ArrayList<YoutubeVideo> implements BaseModel {
+	
+	private static final long serialVersionUID = -1833128943213518653L;
+	
+	private String kind;
+	private String etag;
+	
+	private YoutubeVideosList(){}
+	
+	private void setKind(String kind) {
+		this.kind = kind;
+	}
+	
+	public String getKind(){
+		return this.kind;
+	}
+	
+	private void setEtag(String etag) {
+		this.etag = etag;
+	}
+	
+	public String getEtag(){
+		return this.etag;
+	}
+
+	public static class Builder extends BaseBuilder {
+
+		private static final String TAG_KIND = "kind";
+		private static final String TAG_ETAG = "etag";
+		private static final String TAG_ITEMS = "items";
+		
+		@Override
+		public BaseModel buildModel(String input) throws Exception {
+			JSONObject json = new JSONObject(input);
+			
+			YoutubeVideosList videosList = new YoutubeVideosList();
+			
+			videosList.setKind(json.getString(TAG_KIND));
+			videosList.setEtag(json.getString(TAG_ETAG));
+			
+			JSONArray items = json.getJSONArray(TAG_ITEMS);
+			YoutubeVideo.Builder videoBuilder = new YoutubeVideo.Builder();
+			for(int i = 0 ; i < items.length() ; i++){
+				videosList.add((YoutubeVideo) videoBuilder
+						.buildModel(items.getJSONObject(i).toString()));
+			}
+			
+			return videosList;
+		}
+		
+	}
+	
+}

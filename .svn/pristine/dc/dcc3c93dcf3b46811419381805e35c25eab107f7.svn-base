@@ -1,0 +1,44 @@
+package com.myband.sample.model;
+
+import java.io.InputStream;
+
+public class NewsEntry implements BaseModel {
+
+	private String title;
+	private String imageUrl;
+	private String content;
+
+	public String getTitle() {
+		return title;
+	}
+
+	private void setTitle(String title) {
+		this.title = title;
+	}
+
+	public String getImageUrl() {
+		return imageUrl;
+	}
+
+	private void setImageUrl(String imageUrl) {
+		this.imageUrl = imageUrl;
+	}
+
+	public String getContent() {
+		return content;
+	}
+
+	private void setContent(String content) {
+		this.content = content;
+	}
+	
+	public static class Builder extends BaseBuilder {
+		@Override
+		public BaseModel buildModel(String input) throws Exception {
+			// TODO
+			return null;
+		}
+		
+	}
+
+}

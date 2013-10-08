@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">MyBand</string>
+    <string name="app_news">News</string>
+    
+    <string name="facebook_app_id">503720723033857</string>
+    
+    <!-- Strings for Splash Activity -->
+    <string name="splash_or">Or</string>
+    <string name="splash_welcome_msg">Welcome to Bandtastic\nClick and go!</string>
+    
+    <!-- Strings for News Fragment -->
+    <string name="news_empty">No news found</string>
+    
+    <!-- Strings for Concerts Fragment -->
+    <string name="concerts_empty">No concerts coming</string>
+    
+</resources>

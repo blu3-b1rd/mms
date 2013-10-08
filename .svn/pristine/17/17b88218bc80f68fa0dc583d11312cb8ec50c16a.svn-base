@@ -1,0 +1,9 @@
+package com.bandtastic.sampleband.model;
+
+public interface BaseModel {
+
+	public interface BaseBuilder {
+		public BaseModel buildModel();
+	}
+	
+}

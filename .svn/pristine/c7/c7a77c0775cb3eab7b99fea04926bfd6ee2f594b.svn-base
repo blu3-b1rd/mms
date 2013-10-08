@@ -1,0 +1,42 @@
+package com.bandtastic.sampleband.model;
+
+public class NewsEntry implements BaseModel {
+
+	private String title;
+	private String imageUrl;
+	private String content;
+
+	public String getTitle() {
+		return title;
+	}
+
+	private void setTitle(String title) {
+		this.title = title;
+	}
+
+	public String getImageUrl() {
+		return imageUrl;
+	}
+
+	private void setImageUrl(String imageUrl) {
+		this.imageUrl = imageUrl;
+	}
+
+	public String getContent() {
+		return content;
+	}
+
+	private void setContent(String content) {
+		this.content = content;
+	}
+	
+	public static class Builder implements BaseBuilder {
+		@Override
+		public BaseModel buildModel() {
+			// TODO
+			return null;
+		}
+		
+	}
+
+}

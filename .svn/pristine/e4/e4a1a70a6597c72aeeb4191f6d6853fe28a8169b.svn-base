@@ -1,0 +1,17 @@
+package com.mms.sample.model;
+
+
+public interface MMSModel {
+
+	public abstract class MMSBuilder {
+
+		protected String modelType;
+		
+		public MMSBuilder(String modelType){
+			this.modelType = modelType.replace("list", "");
+		}
+		
+		public abstract MMSModel build(String input) throws Exception;
+	}
+
+}
